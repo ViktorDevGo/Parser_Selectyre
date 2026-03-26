@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(iconv:*)",
+      "Bash(python3:*)",
+      "Bash(pip3 install:*)",
+      "Bash(export PGSSLROOTCERT=$HOME/.cloud-certs/root.crt)",
+      "Bash(psql:*)",
+      "Bash(chmod:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)"
+    ]
+  }
+}

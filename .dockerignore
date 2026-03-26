@@ -1,0 +1,45 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+
+# Логи
+logs/*.log
+
+# CSV данные (будут скачиваться заново)
+*.csv
+*.csv.new
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Документация (необязательная в контейнере)
+*.md
+LOGIC_VISUAL.txt
+
+# Старые версии
+*_old.py
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Временные файлы
+*.tmp
+*.bak

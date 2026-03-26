@@ -1,0 +1,71 @@
+# Production .dockerignore - минимизация размера образа
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+*.egg
+
+# Документация (не нужна в контейнере)
+*.md
+LOGIC_VISUAL.txt
+QUICKSTART.md
+README.md
+README_FULL.md
+DOCKER.md
+LOGIC.md
+
+# Docker
+Dockerfile
+Dockerfile.production
+docker-compose.yml
+.dockerignore
+.dockerignore.production
+.env
+.env.example
+
+# Скрипты установки (не нужны в контейнере)
+setup_*.sh
+Makefile
+
+# SQL скрипты (таблицы уже созданы)
+*.sql
+
+# Старые версии и бэкапы
+*_old.py
+*.bak
+*.tmp
+
+# Логи и данные (будут в volumes)
+logs/
+*.log
+data/
+*.csv
+*.csv.new
+
+# IDE и системные файлы
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Скрипты первичного импорта (не нужны)
+import_data.py
+import_rims.py
+create_table.sql
+create_table_rims.sql
+alter_table.sql
+test_upsert.py

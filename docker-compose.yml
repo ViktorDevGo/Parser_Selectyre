@@ -1,0 +1,64 @@
+services:
+  selectyre-parser:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: selectyre-parser
+    restart: unless-stopped
+    environment:
+      - DB_HOST=${DB_HOST:-c37e696087932476c61fd621.twc1.net}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-default_db}
+      - DB_USER=${DB_USER:-gen_user}
+      - DB_PASSWORD=${DB_PASSWORD:-Poison-79}
+      - DB_SSL_MODE=${DB_SSL_MODE:-verify-full}
+      - TZ=Asia/Novosibirsk
+    volumes:
+      # Логи
+      - ./logs:/app/logs
+      # CSV файлы (для сохранения между запусками)
+      - ./data:/app/data
+      # SSL сертификаты
+      - ~/.cloud-certs:/root/.cloud-certs:ro
+    networks:
+      - selectyre-network
+    # Запуск обновления каждые 4 часа
+    command: >
+      sh -c "
+        echo 'Установка SSL сертификата...'
+        if [ ! -f /root/.cloud-certs/root.crt ]; then
+          echo 'Извлечение SSL сертификата с сервера...'
+          openssl s_client -showcerts -connect ${DB_HOST}:${DB_PORT} -starttls postgres < /dev/null 2>/dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /root/.cloud-certs/root.crt
+        fi
+        echo 'Первый запуск обновления...'
+        python3 update_all.py
+        echo 'Настройка периодического обновления (каждые 4 часа)...'
+        while true; do
+          sleep 14400
+          echo 'Запуск обновления...'
+          python3 update_all.py
+        done
+      "
+
+  # Опционально: можно добавить локальный PostgreSQL
+  # postgres:
+  #   image: postgres:14-alpine
+  #   container_name: selectyre-postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_DB=selectyre
+  #     - POSTGRES_USER=selectyre
+  #     - POSTGRES_PASSWORD=selectyre_password
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   networks:
+  #     - selectyre-network
+
+networks:
+  selectyre-network:
+    driver: bridge
+
+# volumes:
+#   postgres-data:

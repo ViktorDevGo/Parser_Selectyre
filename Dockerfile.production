@@ -1,0 +1,64 @@
+# Production Dockerfile для Timeweb Cloud
+# Оптимизирован для минимального размера и безопасности
+
+FROM python:3.9-slim
+
+# Метаданные
+LABEL maintainer="viktor"
+LABEL description="Selectyre Parser - автообновление данных о шинах и дисках"
+LABEL version="2.0"
+
+# Отключаем буферизацию Python для логов
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Установка только необходимых системных зависимостей
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Создание рабочей директории
+WORKDIR /app
+
+# Копирование только requirements.txt для кэширования слоя
+COPY requirements.txt .
+
+# Установка Python зависимостей
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Копирование только необходимых файлов проекта
+COPY update_all.py .
+COPY update_data.py .
+COPY update_rims.py .
+COPY check_data.py .
+COPY check_rims.py .
+
+# Создание необходимых директорий
+RUN mkdir -p /app/logs /app/data
+
+# Создание non-root пользователя для безопасности
+RUN useradd -m -u 1000 selectyre && \
+    chown -R selectyre:selectyre /app
+
+# Переключение на non-root пользователя
+USER selectyre
+
+# Health check
+HEALTHCHECK --interval=1h --timeout=30s --start-period=1m --retries=3 \
+    CMD python3 -c "import os; exit(0 if os.path.exists('/app/logs') else 1)"
+
+# Запуск приложения
+CMD ["sh", "-c", "\
+    echo 'Selectyre Parser запущен...' && \
+    echo 'Первое обновление...' && \
+    python3 update_all.py && \
+    echo 'Ожидание следующего обновления (${UPDATE_INTERVAL:-14400} сек)...' && \
+    while true; do \
+        sleep ${UPDATE_INTERVAL:-14400}; \
+        echo 'Запуск обновления...' && \
+        python3 update_all.py; \
+    done \
+"]
