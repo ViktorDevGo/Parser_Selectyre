@@ -13,7 +13,7 @@ DB_CONNECTION = {
     'user': 'gen_user',
     'password': 'Poison-79',
     'sslmode': 'verify-full',
-    'sslrootcert': os.path.expanduser('~/.cloud-certs/root.crt')
+    'sslrootcert': 'system'
 }
 
 def main():
