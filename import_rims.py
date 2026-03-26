@@ -14,8 +14,7 @@ DB_CONNECTION = {
     'database': 'default_db',
     'user': 'gen_user',
     'password': 'Poison-79',
-    'sslmode': 'verify-full',
-    'sslrootcert': 'system'
+    'sslmode': 'require'
 }
 
 CSV_FILE = 'selectyre_rims.csv'
